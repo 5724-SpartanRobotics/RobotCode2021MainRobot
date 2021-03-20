@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2021 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,6 +8,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,11 +22,12 @@ public class BallFeedSubsystem extends SubsystemBase {
    * Creates a new ExampleSubsystem.
    */
   public BallFeedSubsystem() {
-    
-
+    motorBottom.setIdleMode(IdleMode.kBrake);    
+    motorTop.setIdleMode(IdleMode.kBrake);
   }
 
   public void runTop(double powerTop) {
+    System.out.print("Run top ball feed command at power " + powerTop);
     // Deadband at plus or minus 5% (because otherwise the ballFeed drifts)
     if (Math.abs(powerTop) < 0.05)
     {
@@ -36,6 +38,7 @@ public class BallFeedSubsystem extends SubsystemBase {
   }
 
   public void runBottom(double powerBottom){
+    System.out.print("Run bottom ball feed command at power " + powerBottom);
     if (Math.abs(powerBottom) < 0.05)
     {
       powerBottom = 0;
