@@ -23,6 +23,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.BallFeedConstants;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.XboxControllerButtonMappings;
 import frc.robot.commands.AutoCommand;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ColorWheelSubsystem;
@@ -103,12 +104,9 @@ public class RobotContainer {
     // Motor speed is specified as a decimal between -1.00 and 1.00, where -1.00 is backward 100% speed,
     // and 1.00 is forwards 100% speed.
     ballFeedSubsystem.setDefaultCommand(new RunCommand(() -> 
-      ballFeedSubsystem.runTop(xboxOperator.getRawAxis(BallFeedConstants.kConveyorJoystick)), ballFeedSubsystem));
+      ballFeedSubsystem.run(xboxOperator.getRawAxis(BallFeedConstants.kElevatorJoystick), xboxOperator.getRawAxis(BallFeedConstants.kConveyorJoystick)), ballFeedSubsystem));
 
-    ballFeedSubsystem.setDefaultCommand(new RunCommand(() -> 
-      ballFeedSubsystem.runBottom(xboxOperator.getRawAxis(BallFeedConstants.kElevatorJoystick)), ballFeedSubsystem));
-
-    intakeSubsystem.setDefaultCommand(new RunCommand(() ->
+      intakeSubsystem.setDefaultCommand(new RunCommand(() ->
       intakeSubsystem.run(-xboxDriver.getRawAxis(IntakeConstants.kIntakeJoystick)), intakeSubsystem));
 
     colorWheelSubsystem.setDefaultCommand(new RunCommand(() -> {
@@ -168,12 +166,16 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+
     // Operator buttons
     JoystickButton intakeExtendBtn = new JoystickButton(xboxOperator, IntakeConstants.kExtendBtn);
     JoystickButton colorWheelBtn = new JoystickButton(xboxOperator, ColorWheelConstants.kFlipBtn);
     JoystickButton flyWheelBtn = new JoystickButton(xboxOperator, ShooterConstants.kFlyWheelBtn);
-    JoystickButton rotateLeftBtn = new JoystickButton(xboxOperator, ShooterConstants.kRotateLeftBtn);
-    JoystickButton rotateRightBtn = new JoystickButton(xboxOperator, ShooterConstants.kRotateRightBtn);
+    JoystickButton shooterManualIncRight = new JoystickButton(xboxOperator, ShooterConstants.kRightRotateOneDegreeBtn);
+    JoystickButton shooterManualIncLeft = new JoystickButton(xboxOperator, ShooterConstants.kLeftRotateOneDegreeBtn);
+    JoystickButton shooterManualIncFiveDegrees = new JoystickButton(xboxOperator, ShooterConstants.kManualRotateButtonsFiveDegreesBtn);
+    JoystickButton shooterFlywheelIncSpeed = new JoystickButton(xboxOperator, ShooterConstants.kManualFlywheelIncSpeedBtn);
+    JoystickButton shooterFlywheelDecSpeed = new JoystickButton(xboxOperator, ShooterConstants.kManualFlywheelDecSpeedBtn);
     
 
     intakeExtendBtn.whenPressed(new InstantCommand(() ->
@@ -186,12 +188,32 @@ public class RobotContainer {
       colorWheelSubsystem.setFlipped(false), colorWheelSubsystem));
     
     flyWheelBtn.whenHeld(new InstantCommand(() ->
-      shooterSubsystem.flyWheelTurn(true), shooterSubsystem));
+      shooterSubsystem.flyWheelSpin(true), shooterSubsystem));
 
     flyWheelBtn.whenReleased(new InstantCommand(() ->
-      shooterSubsystem.flyWheelTurn(false), shooterSubsystem));
+      shooterSubsystem.flyWheelSpin(false), shooterSubsystem));
 
-        
+    shooterFlywheelIncSpeed.whenPressed(new InstantCommand(() ->
+      shooterSubsystem.manualFlywheelVernier(true), shooterSubsystem));
+
+    shooterFlywheelDecSpeed.whenPressed(new InstantCommand(() ->
+      shooterSubsystem.manualFlywheelVernier(false), shooterSubsystem));
+
+    //these buttons add or subtract a position reference vernier to the shooter rotate 
+    // The position reference comes from the limelite, so the vernier will also need to be subtracted from the feedback to the limelite,
+    //  otherwise it will auto correct the manual vernier back out.
+    shooterManualIncRight.whenPressed(new InstantCommand(() ->
+      shooterSubsystem.manualRotateVernier(true), shooterSubsystem));
+
+    shooterManualIncLeft.whenPressed(new InstantCommand(() ->
+      shooterSubsystem.manualRotateVernier(false), shooterSubsystem));
+
+    //when held, the above vernier buttons have more authority, adding and subtracting 5 degrees of position rather than 1 degree.    
+    shooterManualIncFiveDegrees.whenHeld(new InstantCommand(() ->
+      shooterSubsystem.manualRotateSpeed(true), shooterSubsystem));
+
+    shooterManualIncFiveDegrees.whenReleased(new InstantCommand(() ->
+      shooterSubsystem.manualRotateSpeed(false), shooterSubsystem));
 
     // Driver buttons
     JoystickButton shifterBtn = new JoystickButton(xboxDriver, DriveConstants.kShiftBtn);
@@ -229,6 +251,7 @@ public class RobotContainer {
     
     climbReverseBtn.whenReleased(new InstantCommand(() -> 
       climberSubsystem.stopWench(), climberSubsystem));
+
   }
 
   /**

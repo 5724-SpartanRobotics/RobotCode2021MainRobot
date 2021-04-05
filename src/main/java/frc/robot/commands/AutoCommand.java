@@ -34,8 +34,7 @@ public class AutoCommand extends SequentialCommandGroup {
             race(
                 new RunCommand(() -> {
                     robotDrive.arcadeDrive(-0.2, 0);
-                    ballFeedSubsystem.runTop(1);
-                    ballFeedSubsystem.runBottom(1);
+                    ballFeedSubsystem.run(1, 1);
                     intakeSubsystem.run(-0.5);
                 }, ballFeedSubsystem, intakeSubsystem, robotDrive),
                 new WaitCommand(1.5)
@@ -43,8 +42,7 @@ public class AutoCommand extends SequentialCommandGroup {
             race(
                 new RunCommand(() -> {
                     robotDrive.arcadeDrive(-0.2, 0);
-                    ballFeedSubsystem.runTop(-1);
-                    ballFeedSubsystem.runBottom(-1);
+                    ballFeedSubsystem.run(-1, -1);
                     intakeSubsystem.run(-0.5);
                 }, ballFeedSubsystem, intakeSubsystem, robotDrive),
                 new WaitCommand(0.25)
@@ -52,8 +50,7 @@ public class AutoCommand extends SequentialCommandGroup {
             race(
                 new RunCommand(() -> {
                     robotDrive.arcadeDrive(-0.2, 0);
-                    ballFeedSubsystem.runTop(1);
-                    ballFeedSubsystem.runBottom(1);
+                    ballFeedSubsystem.run(1, 1);
                     intakeSubsystem.run(-0.5);
                 }, ballFeedSubsystem, intakeSubsystem, robotDrive),
                 new WaitCommand(0.5)
@@ -74,8 +71,7 @@ public class AutoCommand extends SequentialCommandGroup {
             })*/
             race(
                 new RunCommand(() -> {
-                    ballFeedSubsystem.runTop(0);
-                    ballFeedSubsystem.runBottom(0);
+                    ballFeedSubsystem.run(0, 0);
                     intakeSubsystem.run(0);
                     robotDrive.arcadeDrive(0.4, -0.4);
                 }, robotDrive),

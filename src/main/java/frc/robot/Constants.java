@@ -27,14 +27,14 @@ public final class Constants {
         public static final int kMotorL2ID = 12;
         public static final int kMotorL3ID = 17;
 
-        public static final int kJoystickFwd = 3;
-        public static final int kJoystickRev = 2;
-        public static final int kJoystickRotate = 0;
+        public static final int kJoystickFwd = XboxControllerButtonMappings.kRightTrigger;
+        public static final int kJoystickRev = XboxControllerButtonMappings.kLeftTrigger;
+        public static final int kJoystickRotate = XboxControllerButtonMappings.kLeftJoystickXaxis;
 
-        public static final int kShiftBtn = 1;
-        public static final int kSlowBackBtn = 5;
-        public static final int kSuperSlowBtn = 3;
-        public static final int kTargetFwdBtn = 6;
+        public static final int kShiftBtn = XboxControllerButtonMappings.kBbutton;
+        public static final int kSlowBackBtn = XboxControllerButtonMappings.kLeftBumper;
+        public static final int kSuperSlowBtn = XboxControllerButtonMappings.kXbutton;
+        public static final int kTargetFwdBtn = XboxControllerButtonMappings.kRightBumper;
 
         public static final int kShifterSolenoidID = 2;
 
@@ -63,8 +63,8 @@ public final class Constants {
         public static final int kMotorConveyorID = 9;
         public static final int kMotorElevatorID = 20; 
 
-        public static final int kConveyorJoystick = 5;
-        public static final int kElevatorJoystick = 1;
+        public static final int kConveyorJoystick = XboxControllerButtonMappings.kRightJoystickYaxis;
+        public static final int kElevatorJoystick = XboxControllerButtonMappings.kLeftJoystickYaxis;
 
         public static final int kSolenoidID = 0;
     }
@@ -74,15 +74,24 @@ public final class Constants {
         public static final int kMotorRotate = 16;
 
         public static final int kFlyWheelBtn = 1;
-        public static final int kRotateLeftBtn = 5;
-        public static final int kRotateRightBtn =  6;
+        public static final int kLeftRotateOneDegreeBtn = XboxControllerButtonMappings.kLeftBumper;
+        public static final int kRightRotateOneDegreeBtn = XboxControllerButtonMappings.kRightBumper;
+        public static final int kManualRotateButtonsFiveDegreesBtn = XboxControllerButtonMappings.kBbutton;
+        public static final int kManualFlywheelIncSpeedBtn = XboxControllerButtonMappings.kStartButton;
+        public static final int kManualFlywheelDecSpeedBtn = XboxControllerButtonMappings.kBackButton;
+
+        //8 motor rotations = approximately 90 degrees of travel. These numbers are in motor rotations.
+        public static final double kLargerManualVernier = 0.44;
+        public static final double kSmallManualVernier = 0.178;
+        public static final double kFlywheelSpeed = 0.5;
+        public static final double kFlywheelSpeedVernier = 0.1;//10% speed change
     }
 
     public static final class IntakeConstants {
         public static final int kMotorIntakeID = 32;
         public static final int kSolenoidID = 3;
-        public static final int kIntakeJoystick = 5;
-        public static final int kExtendBtn = 3;
+        public static final int kIntakeJoystick = XboxControllerButtonMappings.kRightJoystickYaxis;
+        public static final int kExtendBtn = XboxControllerButtonMappings.kYbutton;
     }
 
     public static final class ColorWheelConstants {
@@ -90,19 +99,38 @@ public final class Constants {
         public static final int kSolenoidID = 1;
         public static final int kColorWheelLeftPOV = 270;
         public static final int kColorWheelRightPOV = 90;
-        public static final int kFlipBtn = 2;
+        public static final int kFlipBtn = XboxControllerButtonMappings.kXbutton;
     }
 
     public static final class ClimbConstants {
-        public static final int kHookMotorID = 16;
+        public static final int kHookMotorID = 1;
         public static final int kWenchMotor1ID = 30;
         public static final int kWenchMotor2ID = 33;
 
-        public static final int kHookUpBtn = 0;
-        public static final int kHookDownBtn = 0;
-        public static final int kHookMorePower = 8;
+        public static final int kHookUpBtn = XboxControllerButtonMappings.kAbutton;
+        public static final int kHookDownBtn = XboxControllerButtonMappings.kAbutton;
+        public static final int kHookMorePower = XboxControllerButtonMappings.kLeftJoystick;
         
-        public static final int kClimbBtn = 8;
-        public static final int kClimbReverseBtn = 7;
+        public static final int kClimbBtn = XboxControllerButtonMappings.kLeftJoystick;
+        public static final int kClimbReverseBtn = XboxControllerButtonMappings.kStartButton;
+    }
+
+    public static final class XboxControllerButtonMappings {
+        public static final int kAbutton = 1;
+        public static final int kBbutton = 2;
+        public static final int kXbutton = 3;
+        public static final int kYbutton = 4;
+        public static final int kLeftBumper = 5;
+        public static final int kRightBumper = 6;
+        public static final int kBackButton = 7;
+        public static final int kStartButton = 8;
+        public static final int kLeftJoystick = 9;
+        public static final int kRightJoystick = 10;
+        public static final int kLeftJoystickXaxis = 0;
+        public static final int kLeftJoystickYaxis = 1;
+        public static final int kLeftTrigger = 2;
+        public static final int kRightTrigger = 3;
+        public static final int kRightJoystickXaxis = 4;
+        public static final int kRightJoystickYaxis = 5;
     }
 }

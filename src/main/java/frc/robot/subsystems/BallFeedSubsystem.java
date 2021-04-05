@@ -12,6 +12,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.BallFeedConstants;
 
 public class BallFeedSubsystem extends SubsystemBase {
@@ -26,24 +27,22 @@ public class BallFeedSubsystem extends SubsystemBase {
     motorTop.setIdleMode(IdleMode.kBrake);
   }
 
-  public void runTop(double powerTop) {
-    System.out.print("Run top ball feed command at power " + powerTop);
-    // Deadband at plus or minus 5% (because otherwise the ballFeed drifts)
-    if (Math.abs(powerTop) < 0.05)
-    {
-      powerTop = 0;
-    }
+  public void run(double powerBottom, double powerTop){
+    
+     // Deadband at plus or minus 5% (because otherwise the ballFeed drifts)
+     if (Math.abs(powerTop) < 0.05)
+     {
+       powerTop = 0;
+     }
+ 
+     motorTop.set(powerTop);
 
-    motorTop.set(powerTop);
-  }
-
-  public void runBottom(double powerBottom){
-    System.out.print("Run bottom ball feed command at power " + powerBottom);
     if (Math.abs(powerBottom) < 0.05)
     {
       powerBottom = 0;
-    }
-
+      
+     }
+   //  System.out.println("Run bottom ball feed command at power " + powerBottom);
     motorBottom.set(powerBottom);
   }
 
