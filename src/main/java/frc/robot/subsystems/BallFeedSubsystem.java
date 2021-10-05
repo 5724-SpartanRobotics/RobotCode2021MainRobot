@@ -42,6 +42,8 @@ public class BallFeedSubsystem extends SubsystemBase {
       powerBottom = 0;
       
      }
+     //invert the speed ref.
+     powerBottom = powerBottom * -1;
    //  System.out.println("Run bottom ball feed command at power " + powerBottom);
     motorBottom.set(powerBottom);
   }

@@ -7,6 +7,9 @@
 
 package frc.robot.subsystems;
 
+import java.util.Date;
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
@@ -22,6 +25,11 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 public class DrivetrainSubsystem extends SubsystemBase {
 
   private CANSparkMax leftMotorMain = new CANSparkMax(DriveConstants.kMotorR1ID, MotorType.kBrushless);
@@ -30,6 +38,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private CANSparkMax rightMotorMain = new CANSparkMax(DriveConstants.kMotorL1ID, MotorType.kBrushless);
   private CANSparkMax rightMotorAlt1 = new CANSparkMax(DriveConstants.kMotorL2ID, MotorType.kBrushless);
   private CANSparkMax rightMotorAlt2 = new CANSparkMax(DriveConstants.kMotorL3ID, MotorType.kBrushless);
+
+  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+  NetworkTableEntry tx = table.getEntry("tx");
+  NetworkTableEntry ty = table.getEntry("ty");
+  NetworkTableEntry ta = table.getEntry("ta");
 
   private final CANPIDController leftPID;
   private final CANPIDController rightPID;
@@ -143,5 +156,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
         || rightMotorAlt1.getMotorTemperature() >= MAX_MOTOR_TEMP
         || rightMotorAlt2.getMotorTemperature() >= MAX_MOTOR_TEMP;
   }
-
+  //gets a boolean supplier indicating the current lime light y value and waits until it is within a set range
+  public BooleanSupplier waitForY() {
+    BooleanSupplier isYinRange = () -> yIsInRange();
+    return isYinRange;
+  }
+  public boolean yIsInRange() {
+    double y = ty.getDouble(0.0);
+    return y < 22 && y > 18;
+  }
 }

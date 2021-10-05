@@ -20,7 +20,7 @@ import frc.robot.Constants.ClimbConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
   
-  private CANSparkMax hookMotor;// = new CANSparkMax(ClimbConstants.kHookMotorID, MotorType.kBrushless);
+  private CANSparkMax hookMotor = new CANSparkMax(ClimbConstants.kHookMotorID, MotorType.kBrushless);
   // The hook accelerated way too quickly, so we added a ramp
   private SRamp hookSpeed = new SRamp();
   private VictorSPX wenchMotorMain = new VictorSPX(ClimbConstants.kWenchMotor1ID);
@@ -63,6 +63,6 @@ public class ClimberSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     hookSpeed.update();
-    //hookMotor.set(hookSpeed.getOutput());
+    hookMotor.set(hookSpeed.getOutput());
   }
 }

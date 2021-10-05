@@ -14,12 +14,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
 
 import com.revrobotics.CANEncoder;
+import com.revrobotics.CANError;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 
-public class ShooterSubsystem extends SubsystemBase {
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
+public class ShooterSubsystem extends SubsystemBase {
+  public boolean CanShoot = false;
   private CANSparkMax motorFlyWheel = new CANSparkMax(ShooterConstants.kMotorFlyWheel, MotorType.kBrushless);
   private CANSparkMax motorRotate = new CANSparkMax(ShooterConstants.kMotorRotate, MotorType.kBrushless);
   private CANEncoder m_Encoder;
@@ -27,10 +32,16 @@ public class ShooterSubsystem extends SubsystemBase {
 //  public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxVel, minVel, maxAcc, allowedErr;
   private double _ManualPositionVernier;
   private boolean _ManualPositionVernierHighSpeed;
+  private double _RequestedTurretAngle;
+  // Degrees btw
 
   private double _ManualFlywheelPercentSpeedVernier;
   private boolean _FlywheelIsOn;
 
+  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+  NetworkTableEntry tx = table.getEntry("tx");
+  NetworkTableEntry ty = table.getEntry("ty");
+  NetworkTableEntry ta = table.getEntry("ta");
   /**
    * Creates a new ExampleSubsystem.
    */
@@ -100,15 +111,12 @@ public class ShooterSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Set Position", 0);
     SmartDashboard.putNumber("Flywheel Speed", 0);
   }
-
+  public void innit(){
+    
+  }
   public void flyWheelSpin(boolean flyWheelOn) {
-    _FlywheelIsOn = flyWheelOn;
-    //flyWheel operation
-    if (flyWheelOn == true) {
-      motorFlyWheel.set(ShooterConstants.kFlywheelSpeed + _ManualFlywheelPercentSpeedVernier);
-    } else {
-      motorFlyWheel.set(.0);
-    }
+    _FlywheelIsOn = !_FlywheelIsOn;
+    
   }
 
   public void manualRotateSpeed(boolean high)
@@ -160,72 +168,39 @@ public class ShooterSubsystem extends SubsystemBase {
     motorFlyWheel.set(ShooterConstants.kFlywheelSpeed + _ManualFlywheelPercentSpeedVernier);
   }
 
+ 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-  /*
-    // read PID coefficients from SmartDashboard
-    double p = SmartDashboard.getNumber("P Gain", 0);
-    double i = SmartDashboard.getNumber("I Gain", 0);
-    double d = SmartDashboard.getNumber("D Gain", 0);
-    double iz = SmartDashboard.getNumber("I Zone", 0);
-    double ff = SmartDashboard.getNumber("Feed Forward", 0);
-    double max = SmartDashboard.getNumber("Max Output", 0);
-    double min = SmartDashboard.getNumber("Min Output", 0);
-    double maxV = SmartDashboard.getNumber("Max Velocity", 0);
-    double minV = SmartDashboard.getNumber("Min Velocity", 0);
-    double maxA = SmartDashboard.getNumber("Max Acceleration", 0);
-    double allE = SmartDashboard.getNumber("Allowed Closed Loop Error", 0);
-
-    // if PID coefficients on SmartDashboard have changed, write new values to
-    // controller
-    if ((p != kP)) {
-      m_PidController.setP(p);
-      kP = p;
+    //lime light values
+    double x = tx.getDouble(0.0);
+    double y = ty.getDouble(0.0);
+    CanShoot = y > 10;
+    SmartDashboard.putBoolean("Can you shoot ball", CanShoot);
+    
+    //flyWheel operation
+    if (_FlywheelIsOn) {
+      double flyWheelSpeed = speedLmaoBox(y, 8, 35, 1, 2) / 148.6 * 2.2;
+      SmartDashboard.putNumber("Expected Speed", flyWheelSpeed);
+      motorFlyWheel.set(flyWheelSpeed);
+    } else {
+      motorFlyWheel.set(0);
+      SmartDashboard.putNumber("Expected Speed", 0);
     }
-    if ((i != kI)) {
-      m_PidController.setI(i);
-      kI = i;
-    }
-    if ((d != kD)) {
-      m_PidController.setD(d);
-      kD = d;
-    }
-    if ((iz != kIz)) {
-      m_PidController.setIZone(iz);
-      kIz = iz;
-    }
-    if ((ff != kFF)) {
-      m_PidController.setFF(ff);
-      kFF = ff;
-    }
-    m_PidController.setOutputRange(min, max);
-    kMinOutput = min;
-    kMaxOutput = max;
-    if ((maxV != maxVel)) {
-      m_PidController.setSmartMotionMaxVelocity(maxV, 0);
-      maxVel = maxV;
-    }
-    if ((minV != minVel)) {
-      m_PidController.setSmartMotionMinOutputVelocity(minV, 0);
-      minVel = minV;
-    }
-    if ((maxA != maxAcc)) {
-      m_PidController.setSmartMotionMaxAccel(maxA, 0);
-      maxAcc = maxA;
-    }
-    if ((allE != allowedErr)) {
-      m_PidController.setSmartMotionAllowedClosedLoopError(allE, 0);
-      allowedErr = allE;
-    }
-*/
-    double processVariable;
-    double setPoint = SmartDashboard.getNumber("Set Position", 0);
+    
+    //turret rotation
+    double processVariable; //turret rotation position in motor turns (4 turns = 45 degrees of turret rotation)
+    _RequestedTurretAngle = rotLmaoBox(-1, x, y, 1.5, 2, 8);
+    SmartDashboard.putNumber("Requested Angle", _RequestedTurretAngle);
+    double setPoint = _RequestedTurretAngle / 45 * 4;
     // clamp the position setpoint to +/- 4 (motor turns)
     if (setPoint > 4)
       setPoint = 4;
     else if (setPoint < -4)
       setPoint = -4;
+      //If the turret powered up at an offset from straight forward, then the limelight calculated
+      // position will always be off by that amount. This allows the operator left and right bumper
+      // buttons to add or subtract 1 degree of rotation.
       setPoint += _ManualPositionVernier;
       // System.out.println(" Position setpoint " + setPoint);
     /**
@@ -233,14 +208,43 @@ public class ShooterSubsystem extends SubsystemBase {
      * method on an existing pid object and setting the control type to kSmartMotion
      */
     //using the position setpoint from the smart dashboard, this will come from limelight code in the future.
-    m_PidController.setReference(setPoint, ControlType.kSmartMotion);
+    CANError err = m_PidController.setReference(setPoint, ControlType.kSmartMotion);
+    SmartDashboard.putNumber("PID reference result", err.value);
     processVariable = m_Encoder.getPosition();
 
     SmartDashboard.putNumber("SetPoint", setPoint);
   //  SmartDashboard.putNumber("Manual Rotate Vernier", _ManualPositionVernier);
     SmartDashboard.putNumber("Process Variable", processVariable);
-  //  SmartDashboard.putNumber("Output", motorRotate.getAppliedOutput());
+    SmartDashboard.putNumber("Turret Output", motorRotate.getAppliedOutput());
     SmartDashboard.putNumber("Flywheel Speed", motorFlyWheel.getEncoder().getVelocity());
+    
+    double area = ta.getDouble(0.0);
+    SmartDashboard.putNumber("LimelightX", x);
+    SmartDashboard.putNumber("LimelightY", y);
+    SmartDashboard.putNumber("LimelightArea", area);
+  
   }
-
+  // GET GOOD, GET LMAOBOX
+  // TF2 reference, this piece of code automatically determines the speed to spin the wheels
+  public double speedLmaoBox(double ydeg, double y, double sdeg, double lHeight, double sHeight) {
+    double x = (y - lHeight)/Math.tan(Math.toRadians(ydeg));
+    double sRad = Math.toRadians(sdeg);
+    double xSpeed = Math.sqrt(32*x/(Math.tan(sRad) + (sHeight - y) / x));
+    double cosSdeg = Math.cos(sRad);
+    if (cosSdeg == 0)
+      cosSdeg = .001;
+    double spd = xSpeed/cosSdeg;
+    //System.out.println(spd);
+    return (spd);
+  }
+  public double rotLmaoBox(double offset, double xdeg, double ydeg, double lHeight, double sHeight, double y) {
+    double tanY = Math.tan(Math.toRadians(ydeg));
+    if (tanY == 0)
+      tanY = .001;
+    double d = (y - lHeight)/tanY;
+    if (d == 0)
+      d = .001;
+    double w = d * Math.tan(Math.toRadians(xdeg));
+    return Math.toDegrees(Math.atan((w - offset)/d));
+  }
 }

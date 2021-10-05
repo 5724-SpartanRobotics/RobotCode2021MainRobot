@@ -103,7 +103,7 @@ public final class Constants {
     }
 
     public static final class ClimbConstants {
-        public static final int kHookMotorID = 1;
+        public static final int kHookMotorID = 21;
         public static final int kWenchMotor1ID = 30;
         public static final int kWenchMotor2ID = 33;
 

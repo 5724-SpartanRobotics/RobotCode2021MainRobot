@@ -7,13 +7,21 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -54,7 +62,7 @@ public class RobotContainer {
   private final XboxController xboxOperator = new XboxController(1);
 
   // The autonomous command
-  private final Command autoCommand = new AutoCommand(drivetrainSubsystem, intakeSubsystem, ballFeedSubsystem);
+  private final Command autoCommand = new AutoCommand(shooterSubsystem, drivetrainSubsystem, intakeSubsystem, ballFeedSubsystem);
 
 
   /**
@@ -69,7 +77,24 @@ public class RobotContainer {
     cam1.setResolution(160, 120);
     cam2.setResolution(320, 240);
 
-    // Configure the button bindings
+    //    // Set the scheduler to log Shuffleboard events for command initialize, interrupt, finish
+    // CommandScheduler.getInstance()
+    //     .onCommandInitialize(
+    //         command ->
+    //             Shuffleboard.addEventMarker(
+    //                 "Command initialized", command.getName(), EventImportance.kNormal));
+    // CommandScheduler.getInstance()
+    //     .onCommandInterrupt(
+    //         command ->
+    //             Shuffleboard.addEventMarker(
+    //                 "Command interrupted", command.getName(), EventImportance.kNormal));
+    // CommandScheduler.getInstance()
+    //     .onCommandFinish(
+    //         command ->
+    //             Shuffleboard.addEventMarker(
+    //                 "Command finished", command.getName(), EventImportance.kNormal));
+
+ // Configure the button bindings
     configureButtonBindings();
 
     drivetrainSubsystem.setDefaultCommand(new RunCommand(() -> {
@@ -145,7 +170,6 @@ public class RobotContainer {
       climberSubsystem.runHook(hookSpeed);
     }, climberSubsystem));
   }
-
   // This is called in the robot's autonomousInit method (when the robot is put into auto)
   public void readyForAuto() {
     readyForTeleop();
@@ -187,11 +211,8 @@ public class RobotContainer {
     colorWheelBtn.whenReleased(new InstantCommand(() ->
       colorWheelSubsystem.setFlipped(false), colorWheelSubsystem));
     
-    flyWheelBtn.whenHeld(new InstantCommand(() ->
+    flyWheelBtn.whenPressed(new InstantCommand(() ->
       shooterSubsystem.flyWheelSpin(true), shooterSubsystem));
-
-    flyWheelBtn.whenReleased(new InstantCommand(() ->
-      shooterSubsystem.flyWheelSpin(false), shooterSubsystem));
 
     shooterFlywheelIncSpeed.whenPressed(new InstantCommand(() ->
       shooterSubsystem.manualFlywheelVernier(true), shooterSubsystem));
