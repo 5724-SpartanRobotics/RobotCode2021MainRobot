@@ -114,7 +114,11 @@ public class ShooterSubsystem extends SubsystemBase {
   public void innit(){
     
   }
-  public void flyWheelSpin(boolean flyWheelOn) {
+  public void flyWheelTurnOn(boolean on)
+  {
+    _FlywheelIsOn = on;
+  }
+  public void flyWheelToggle(boolean flyWheelOn) {
     _FlywheelIsOn = !_FlywheelIsOn;
     
   }
@@ -177,10 +181,12 @@ public class ShooterSubsystem extends SubsystemBase {
     double y = ty.getDouble(0.0);
     CanShoot = y > 10;
     SmartDashboard.putBoolean("Can you shoot ball", CanShoot);
-    
+    SmartDashboard.putBoolean("Is Flywheel On", _FlywheelIsOn);
     //flyWheel operation
     if (_FlywheelIsOn) {
-      double flyWheelSpeed = speedLmaoBox(y, 8, 35, 1, 2) / 148.6 * 2.2;
+      double flyWheelSpeed = speedLmaoBox(y, 8, 35, 1, 2) / 148.6 * 2.15;
+      if (flyWheelSpeed > 1)
+        flyWheelSpeed = 1;
       SmartDashboard.putNumber("Expected Speed", flyWheelSpeed);
       motorFlyWheel.set(flyWheelSpeed);
     } else {
@@ -227,7 +233,10 @@ public class ShooterSubsystem extends SubsystemBase {
   // GET GOOD, GET LMAOBOX
   // TF2 reference, this piece of code automatically determines the speed to spin the wheels
   public double speedLmaoBox(double ydeg, double y, double sdeg, double lHeight, double sHeight) {
-    double x = (y - lHeight)/Math.tan(Math.toRadians(ydeg));
+   double tanY = Math.tan(Math.toRadians(ydeg));
+   if (tanY < 0.17)
+     tanY = .36;
+   double x = (y - lHeight)/tanY;
     double sRad = Math.toRadians(sdeg);
     double xSpeed = Math.sqrt(32*x/(Math.tan(sRad) + (sHeight - y) / x));
     double cosSdeg = Math.cos(sRad);

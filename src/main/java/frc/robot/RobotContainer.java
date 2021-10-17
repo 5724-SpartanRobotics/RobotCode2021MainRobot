@@ -212,7 +212,7 @@ public class RobotContainer {
       colorWheelSubsystem.setFlipped(false), colorWheelSubsystem));
     
     flyWheelBtn.whenPressed(new InstantCommand(() ->
-      shooterSubsystem.flyWheelSpin(true), shooterSubsystem));
+      shooterSubsystem.flyWheelToggle(true), shooterSubsystem));
 
     shooterFlywheelIncSpeed.whenPressed(new InstantCommand(() ->
       shooterSubsystem.manualFlywheelVernier(true), shooterSubsystem));

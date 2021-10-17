@@ -157,12 +157,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
         || rightMotorAlt2.getMotorTemperature() >= MAX_MOTOR_TEMP;
   }
   //gets a boolean supplier indicating the current lime light y value and waits until it is within a set range
-  public BooleanSupplier waitForY() {
-    BooleanSupplier isYinRange = () -> yIsInRange();
+  public BooleanSupplier waitForY(double a, double t) {
+    BooleanSupplier isYinRange = () -> yIsInRange(a, t);
     return isYinRange;
   }
-  public boolean yIsInRange() {
+  public boolean yIsInRange(double accuracy, double target) {
     double y = ty.getDouble(0.0);
-    return y < 22 && y > 18;
+    return y < (target + accuracy) && y > (target - accuracy);
   }
 }
