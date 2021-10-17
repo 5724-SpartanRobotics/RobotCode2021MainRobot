@@ -35,12 +35,11 @@ public class AutoCommand extends SequentialCommandGroup {
             new InstantCommand(() -> intakeSubsystem.setExtended(true), intakeSubsystem),
             race(
                 new RunCommand(() -> {
-                    robotDrive.arcadeDrive(0, 0);
+                    robotDrive.arcadeDrive(0.6, 0);
                     ballFeedSubsystem.run(0, 0);
-                    robotDrive.arcadeDrive(0.4, 0);
-                    shooterSubsystem.flyWheelSpin(true);
-                    }, robotDrive, shooterSubsystem, ballFeedSubsystem),
-                new WaitUntilCommand(robotDrive.waitForY()),
+                    shooterSubsystem.flyWheelTurnOn(true);
+                    }, robotDrive, ballFeedSubsystem, shooterSubsystem),
+                new WaitUntilCommand(robotDrive.waitForY(2, 22)),
                 new WaitCommand(2) //used for a maximum step timeout
             ),
             race(
@@ -48,14 +47,40 @@ public class AutoCommand extends SequentialCommandGroup {
                 new WaitCommand(2)
             ),
             race(
-                new RunCommand(() -> ballFeedSubsystem.run(-0.2, -0.3),ballFeedSubsystem),
-                new WaitCommand(5)//waits until the game clock is at 5 or greater seconds
+                new RunCommand(() -> ballFeedSubsystem.run(-0.67, -1),ballFeedSubsystem),
+                new WaitCommand(2.5)//Yes this is enough time, we're running it so 
+                // fast that it's coming close to breaking the robot.  Don't question it.
+            ), 
+            race(
+                new RunCommand(() -> {
+                    robotDrive.arcadeDrive(0.4, 0);
+                    ballFeedSubsystem.run(0,0);
+                    intakeSubsystem.setExtended(true);
+                    intakeSubsystem.run(-1);
+                },  robotDrive, ballFeedSubsystem, intakeSubsystem),
+                new WaitUntilCommand(robotDrive.waitForY(1, 11.5)),
+                new WaitCommand(4)
+            ),
+            race(
+                new RunCommand(() -> {
+                    robotDrive.arcadeDrive(-0.4, 0);
+                    intakeSubsystem.run(0);
+                }, robotDrive, intakeSubsystem),
+                new WaitUntilCommand(robotDrive.waitForY(1, 19)),
+                new WaitCommand(4)
+            ),
+            race(
+                new RunCommand(() -> {
+                    ballFeedSubsystem.run(-0.67, -1);
+                    intakeSubsystem.run(0);
+                }, ballFeedSubsystem, intakeSubsystem),
+                new WaitCommand(4)//waits until the game clock is at 5 or greater seconds
             ),
             race(
                 new RunCommand(() -> {
                     ballFeedSubsystem.run(0,0);
                     intakeSubsystem.setExtended(true);
-                    shooterSubsystem.flyWheelSpin(false);
+                    shooterSubsystem.flyWheelTurnOn(false);
                 },  ballFeedSubsystem, intakeSubsystem, shooterSubsystem),
                 new WaitCommand(0.2)
             )  
